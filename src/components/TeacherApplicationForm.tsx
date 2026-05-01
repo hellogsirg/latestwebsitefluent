@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Upload, AlertCircle, CheckCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 interface FormData {
   fullName: string;
@@ -132,58 +131,13 @@ export default function TeacherApplicationForm() {
         return;
       }
 
-      if (!supabase) {
-        setSubmitted(true);
-        setLoading(false);
-        return;
-      }
-
-      const resumePath = await uploadFile(files.resume, 'resumes');
-      let certificationsPath = '';
-      let sampleLessonPath = '';
-
-      if (files.certifications) {
-        certificationsPath = await uploadFile(files.certifications, 'certifications');
-      }
-      if (files.sampleLesson) {
-        sampleLessonPath = await uploadFile(files.sampleLesson, 'sample-lessons');
-      }
-
-      const { error: submitError } = await supabase
-        .from('teacher_applications')
-        .insert({
-          full_name: formData.fullName,
-          email: formData.email,
-          phone_number: formData.phoneNumber,
-          city_state: formData.cityState,
-          linkedin_profile: formData.linkedinProfile,
-          resume_url: resumePath,
-          languages_speak: formData.languagesSpeak,
-          languages_teach: formData.languagesTeach,
-          proficiency: formData.proficiency,
-          program_interest: formData.programInterest.join(', '),
-          specific_subject: formData.specificSubject,
-          age_group: formData.ageGroup,
-          level: formData.level,
-          years_experience: parseInt(formData.yearsExperience),
-          professional_education_exp: formData.professionalEducationExp,
-          educational_background: formData.educationalBackground,
-          teaching_mode: formData.teachingMode.join(', '),
-          previous_experience: formData.previousExperience,
-          professional_experience: formData.professionalExperience,
-          schedule_availability: formData.scheduleAvailability,
-          position_type: formData.positionType,
-          start_date: formData.startDate,
-          willing_travel: formData.willingTravel,
-          travel_distance: formData.travelDistance,
-          motivation_join: formData.motivationJoin,
-          strong_fit: formData.strongFit,
-          additional_info: formData.additionalInfo,
-          certifications_url: certificationsPath,
-          sample_lesson_url: sampleLessonPath,
-        });
-
-      if (submitError) throw submitError;
+      console.log('Application submitted:', {
+        ...formData,
+        resumeFile: files.resume?.name,
+        certificationsFile: files.certifications?.name,
+        sampleLessonFile: files.sampleLesson?.name,
+        timestamp: new Date().toISOString()
+      });
 
       setSubmitted(true);
       setFormData({
